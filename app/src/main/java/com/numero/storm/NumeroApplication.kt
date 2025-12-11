@@ -1,19 +1,16 @@
 package com.numero.storm
 
 import android.app.Application
-import android.content.Context
 import android.content.res.Configuration
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import com.numero.storm.crash.CrashHandler
 import com.numero.storm.data.model.AppLanguage
+import com.numero.storm.di.NumeroDataStore
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import java.util.Locale
-
-private val Context.appDataStore by preferencesDataStore(name = "numero_settings")
 
 /**
  * Main Application class for Numero.
@@ -39,7 +36,8 @@ class NumeroApplication : Application() {
     private fun applySavedLanguage() {
         runBlocking {
             try {
-                val languageCode = appDataStore.data.map { preferences ->
+                val dataStore = NumeroDataStore.get(this@NumeroApplication)
+                val languageCode = dataStore.data.map { preferences ->
                     preferences[stringPreferencesKey("language")] ?: AppLanguage.ENGLISH.code
                 }.first()
 

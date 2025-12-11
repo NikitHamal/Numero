@@ -14,15 +14,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.numero.storm.data.model.AppLanguage
 import com.numero.storm.data.model.ThemeMode
+import com.numero.storm.di.NumeroDataStore
 import com.numero.storm.ui.navigation.NumeroNavHost
 import com.numero.storm.ui.theme.NumeroTheme
 import com.numero.storm.ui.viewmodel.MainViewModel
@@ -31,8 +28,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.runBlocking
 import java.util.Locale
-
-private val Context.mainDataStore by preferencesDataStore(name = "numero_settings")
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -67,8 +62,9 @@ class MainActivity : ComponentActivity() {
 
     private fun applyLocale(context: Context): Context {
         return try {
+            val dataStore = NumeroDataStore.get(context)
             val languageCode = runBlocking {
-                context.mainDataStore.data.map { preferences ->
+                dataStore.data.map { preferences ->
                     preferences[stringPreferencesKey("language")] ?: AppLanguage.ENGLISH.code
                 }.first()
             }
@@ -87,8 +83,9 @@ class MainActivity : ComponentActivity() {
 
     private fun getCurrentLanguage(): AppLanguage {
         return try {
+            val dataStore = NumeroDataStore.get(this)
             runBlocking {
-                val code = mainDataStore.data.map { preferences ->
+                val code = dataStore.data.map { preferences ->
                     preferences[stringPreferencesKey("language")] ?: AppLanguage.ENGLISH.code
                 }.first()
                 AppLanguage.entries.find { it.code == code } ?: AppLanguage.ENGLISH
