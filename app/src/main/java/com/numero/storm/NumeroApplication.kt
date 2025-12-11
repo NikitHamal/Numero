@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.res.Configuration
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.numero.storm.crash.CrashHandler
 import com.numero.storm.data.model.AppLanguage
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.flow.first
@@ -23,6 +24,8 @@ class NumeroApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        // Initialize crash handler first to catch any crashes during startup
+        CrashHandler.initialize(this)
         // Apply saved language on app startup
         applySavedLanguage()
     }
